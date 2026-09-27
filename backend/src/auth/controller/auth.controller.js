@@ -53,7 +53,7 @@ export async function login (req,res)
         },
     });
     if (!foundUser || !foundUser.isActive)
-        return res.status(401).json({message:"access has been revoked"});
+        return res.status(401).json({message:"invalid credentials"});
     if (foundUser && await bcrypt.compare(password, foundUser.hashedPassword))
     {
         const user= { username: foundUser.username, id: foundUser.id, role: foundUser.role, isActive: foundUser.isActive};
