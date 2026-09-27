@@ -9,14 +9,17 @@ datasource db {
 }
 
 model cities {
-  id                 String               @id
-  name               String               @unique
-  level_thresholds   Int[]
-  max_level          Int                  @default(5)
-  craft_categories   craft_categories[]
-  quests             quests[]
-  sellers            sellers[]
-  user_city_progress user_city_progress[]
+  id                  String               @id
+  name                String               @unique
+  level_thresholds    Int[]
+  max_level           Int                  @default(5)
+  cities_jspine_url   String?              @unique
+  cities_jcover_url   String?              @unique
+  cities_stickers_url String[]
+  craft_categories    craft_categories[]
+  quests              quests[]
+  sellers             sellers[]
+  user_city_progress  user_city_progress[]
 }
 
 model completed_quests {
@@ -55,11 +58,14 @@ model quests {
   xp                 Int
   qr_code            String             @unique
   created_by         String
+  quests_badges_url  String?            @unique(map: "quests_quests_badges_key")
   completed_quests   completed_quests[]
+  quest_stickers     quest_stickers?
   cities             cities             @relation(fields: [city_id], references: [id])
   users              users              @relation(fields: [created_by], references: [id])
   quiz_attempts      quiz_attempts[]
   quiz_questions     quiz_questions[]
+  journal_entries    journal_entries[]
 }
 
 model quiz_questions {
@@ -121,6 +127,7 @@ model users {
   site_contacts                    site_contacts?
   user_city_progress               user_city_progress[]
   user_preferences                 user_preferences[]
+  journal_entries                  journal_entries[]
 }
 
 model quiz_attempts {
@@ -170,4 +177,37 @@ model user_preferences {
   users             users            @relation(fields: [user_id], references: [id])
 
   @@unique([user_id, craft_category_id])
+}
+
+model quest_stickers {
+  id          String   @id
+  quest_id    String   @unique
+  name        String
+  description String?
+  image_path  String
+  created_at  DateTime @default(now()) @db.Timestamp(6)
+  quests      quests   @relation(fields: [quest_id], references: [id])
+}
+
+model ratings {
+  id          String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  user_id     String   @db.Uuid
+  quest_id    String?
+  seller_id   String?
+  rating      Int
+  review_text String?
+  created_at  DateTime @default(now()) @db.Timestamptz(6)
+  updated_at  DateTime @default(now()) @db.Timestamptz(6)
+}
+
+model journal_entries {
+  id         String   @id @default(uuid())
+  user_id    String
+  quest_id   String
+  photo_urls String[]
+  caption    String?
+  sticker_id String?
+  created_at DateTime @default(now())
+  users      users    @relation(fields: [user_id], references: [id])
+  quests     quests   @relation(fields: [quest_id], references: [id])
 }
