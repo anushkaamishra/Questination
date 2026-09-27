@@ -7,9 +7,9 @@ import { PrismaClient } from '@prisma/client';
 const prisma = new PrismaClient();
 dotenv.config({ path: new URL("../.env", import.meta.url) });
 export async function register (req, res) {
-    const { username, email, password, role}=req.body;
-    if (!username || !email || !password) {
-    return res.status(400).json({ message: "missing required fields" });
+    const { username, email, password, role, phone}=req.body;
+    if (!username || !email || !password || !phone || !role) {
+    return res.status(400).json({ message: "missing required fields" })
 };
     const allowedRoles=["tourist", "seller"];
     if(!allowedRoles.includes(role))
@@ -30,7 +30,7 @@ export async function register (req, res) {
         });
     }
     const hashedPassword= await bcrypt.hash(password,10);
-    const newUser= { username, email, hashedPassword, role, isActive, "id":crypto.randomUUID(), verificationStatus};
+    const newUser= { username, email, hashedPassword, role, isActive, "id":crypto.randomUUID(), verificationStatus, phone};
     await prisma.users.create({ data: newUser});
     res.status(201).json({
         "message": "new user added"
@@ -53,7 +53,7 @@ export async function login (req,res)
         },
     });
     if (!foundUser || !foundUser.isActive)
-        return res.status(401).json({message:"access has been revoked"});
+        return res.status(401).json({message:"invalid credentials"});
     if (foundUser && await bcrypt.compare(password, foundUser.hashedPassword))
     {
         const user= { username: foundUser.username, id: foundUser.id, role: foundUser.role, isActive: foundUser.isActive};
