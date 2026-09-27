@@ -1,14 +1,13 @@
 import { Outlet, Link, useLocation } from "react-router-dom";
-import { Ticket, Store, Star, ShieldCheck, Landmark } from "lucide-react";
+import { Store, ShieldCheck, Landmark, UserCog } from "lucide-react";
 import { useRole } from "../context/RoleContext";
 import PalaceSkyline from "./PalaceSkyline";
 
 const navItems = [
-  { to: "/", label: "Verify Customer Coupon", icon: Ticket, roles: ["seller"] },
   { to: "/profile", label: "Seller Profile", icon: Store, roles: ["seller"] },
-  { to: "/ratings", label: "Ratings", icon: Star, roles: ["seller"] },
-  { to: "/admin", label: "Admin Approvals", icon: ShieldCheck, roles: ["admin"] },
-  { to: "/monuments", label: "Monument Seeder", icon: Landmark, roles: ["admin"] },
+  { to: "/admin", label: "Verify Seller", icon: ShieldCheck, roles: ["admin"] },
+  { to: "/monuments", label: "Add Monument", icon: Landmark, roles: ["admin"] },
+  { to: "/promote", label: "Promote to Admin", icon: UserCog, roles: ["admin"] },
 ];
 
 function Layout() {
