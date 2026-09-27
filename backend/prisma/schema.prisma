@@ -178,3 +178,14 @@ model user_preferences {
 
   @@unique([user_id, craft_category_id])
 }
+
+model ratings {
+  id          String   @id @default(uuid()) @db.Uuid
+  user_id     String   @db.Uuid
+  quest_id    String?
+  seller_id   String?  
+  rating      Int
+  review_text String?
+  created_at  DateTime @default(now()) @db.Timestamptz(6)
+  updated_at  DateTime @default(now()) @db.Timestamptz(6)
+}
