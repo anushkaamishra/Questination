@@ -60,12 +60,12 @@ model quests {
   created_by         String
   quests_badges_url  String?            @unique(map: "quests_quests_badges_key")
   completed_quests   completed_quests[]
+  journal_entries    journal_entries[]
   quest_stickers     quest_stickers?
   cities             cities             @relation(fields: [city_id], references: [id])
   users              users              @relation(fields: [created_by], references: [id])
   quiz_attempts      quiz_attempts[]
   quiz_questions     quiz_questions[]
-  journal_entries    journal_entries[]
 }
 
 model quiz_questions {
@@ -121,13 +121,13 @@ model users {
   completed_quests                 completed_quests[]
   coupons_coupons_seller_idTousers coupons[]            @relation("coupons_seller_idTousers")
   coupons_coupons_user_idTousers   coupons[]            @relation("coupons_user_idTousers")
+  journal_entries                  journal_entries[]
   quests                           quests[]
   quiz_attempts                    quiz_attempts[]
   sellers                          sellers?
   site_contacts                    site_contacts?
   user_city_progress               user_city_progress[]
   user_preferences                 user_preferences[]
-  journal_entries                  journal_entries[]
 }
 
 model quiz_attempts {
@@ -206,8 +206,9 @@ model journal_entries {
   quest_id   String
   photo_urls String[]
   caption    String?
+  is_public  Boolean  @default(false) 
   sticker_id String?
   created_at DateTime @default(now())
-  users      users    @relation(fields: [user_id], references: [id])
   quests     quests   @relation(fields: [quest_id], references: [id])
+  users      users    @relation(fields: [user_id], references: [id])
 }
