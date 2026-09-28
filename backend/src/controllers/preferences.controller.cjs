@@ -16,6 +16,11 @@ async function getCraftCategoriesByCity(req, res) {
 // body: { userId, craftCategoryIds: [...] }  — min 1, no max
 async function savePreferences(req, res) {
   const { userId, craftCategoryIds } = req.body;
+  const userId = req.user.id;
+  console.log('req.user:', req.user);       // TEMP
+  console.log('userId:', userId);            // TEMP
+  const { craftCategoryIds } = req.body;
+  console.log('craftCategoryIds:', craftCategoryIds);  // TEMP
 
   if (!userId) return res.status(400).json({ error: 'userId is required' });
   if (!craftCategoryIds?.length) {
