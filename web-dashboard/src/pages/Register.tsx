@@ -1,36 +1,66 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { UserPlus } from "lucide-react";
-import PalaceSkyline from "../components/PalaceSkyline";
+import AuthBackground from "../components/AuthBackground";
 
-const API_BASE = "https://questination-production.up.railway.app";
+const API_BASE =
+  "https://questination-production-08b6.up.railway.app";
 
 function Register() {
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [phone, setPhone] = useState("");
+
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
   const [loading, setLoading] = useState(false);
+
   const navigate = useNavigate();
 
   async function handleRegister() {
+    if (
+      !username.trim() ||
+      !email.trim() ||
+      !password.trim() ||
+      !phone.trim()
+    ) {
+      setError("Please fill in all fields.");
+      return;
+    }
+
     setLoading(true);
     setError("");
+    setSuccess(false);
+
     try {
       const response = await fetch(`${API_BASE}/auth/register`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ username, email, password, phone, role: "seller" }),
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          username,
+          email,
+          password,
+          phone,
+          role: "seller",
+        }),
       });
+
       const data = await response.json().catch(() => null);
 
       if (response.ok) {
         setSuccess(true);
-        setTimeout(() => navigate("/login"), 1500);
+
+        setTimeout(() => {
+          navigate("/login");
+        }, 1500);
       } else {
-        setError(data?.message || `Registration failed (status ${response.status})`);
+        setError(
+          data?.message ||
+            `Registration failed (status ${response.status})`
+        );
       }
     } catch (err: any) {
       setError(`Network error: ${err.message}`);
@@ -39,64 +69,125 @@ function Register() {
     }
   }
 
-  return (
-    <div className="min-h-screen relative bg-gradient-to-br from-emerald-50 via-teal-50 to-amber-50 flex items-center justify-center overflow-hidden">
-      <PalaceSkyline />
-      <div className="relative bg-white p-10 rounded-2xl shadow-lg shadow-emerald-900/10 border border-amber-100 w-[400px]">
-        <h1 className="text-3xl font-bold text-gray-900 mb-1">Questination</h1>
-        <p className="text-lg font-medium text-gray-600 mb-6">Seller Sign Up</p>
+  const inputClass =
+    "mb-4 h-[51px] w-full rounded-[8px] border border-[#dce5e2] bg-white px-4 text-[14px] text-gray-800 outline-none transition focus:border-[#07875f] focus:ring-2 focus:ring-[#07875f]/15";
 
-        <label className="block text-sm font-medium mb-1 text-gray-700">Username</label>
+  return (
+    <AuthBackground>
+      <div className="w-full max-w-[515px] rounded-[15px] border border-[#edf0ee] bg-white px-9 py-8 shadow-[0_14px_40px_rgba(24,69,53,0.12)] sm:px-11 sm:py-9">
+
+        <h1 className="text-[30px] font-bold leading-tight tracking-[-0.6px] text-[#183b34]">
+          Create Account
+        </h1>
+
+        <p className="mt-2 mb-6 text-[14px] font-medium text-[#40504c]">
+          Seller Sign Up
+        </p>
+
+        {/* USERNAME */}
+
+        <label className="mb-2 block text-[14px] font-semibold text-[#203c36]">
+          Username
+        </label>
+
         <input
           type="text"
           value={username}
           onChange={(e) => setUsername(e.target.value)}
-          className="w-full border border-gray-200 rounded-lg px-4 py-3 mb-3 focus:outline-none focus:ring-2 focus:ring-emerald-400 transition"
+          autoComplete="username"
+          className={inputClass}
         />
 
-        <label className="block text-sm font-medium mb-1 text-gray-700">Email</label>
+        {/* EMAIL */}
+
+        <label className="mb-2 block text-[14px] font-semibold text-[#203c36]">
+          Email
+        </label>
+
         <input
           type="email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          className="w-full border border-gray-200 rounded-lg px-4 py-3 mb-3 focus:outline-none focus:ring-2 focus:ring-emerald-400 transition"
+          autoComplete="email"
+          className={inputClass}
         />
 
-        <label className="block text-sm font-medium mb-1 text-gray-700">Phone</label>
+        {/* PHONE */}
+
+        <label className="mb-2 block text-[14px] font-semibold text-[#203c36]">
+          Phone
+        </label>
+
         <input
-          type="text"
+          type="tel"
           value={phone}
           onChange={(e) => setPhone(e.target.value)}
-          className="w-full border border-gray-200 rounded-lg px-4 py-3 mb-3 focus:outline-none focus:ring-2 focus:ring-emerald-400 transition"
+          autoComplete="tel"
+          className={inputClass}
         />
 
-        <label className="block text-sm font-medium mb-1 text-gray-700">Password</label>
+        {/* PASSWORD */}
+
+        <label className="mb-2 block text-[14px] font-semibold text-[#203c36]">
+          Password
+        </label>
+
         <input
           type="password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
-          className="w-full border border-gray-200 rounded-lg px-4 py-3 mb-4 focus:outline-none focus:ring-2 focus:ring-emerald-400 transition"
+          onKeyDown={(e) => {
+            if (e.key === "Enter") {
+              handleRegister();
+            }
+          }}
+          autoComplete="new-password"
+          className="mb-5 h-[51px] w-full rounded-[8px] border border-[#dce5e2] bg-white px-4 text-[14px] text-gray-800 outline-none transition focus:border-[#07875f] focus:ring-2 focus:ring-[#07875f]/15"
         />
 
+        {/* CREATE ACCOUNT */}
+
         <button
+          type="button"
           onClick={handleRegister}
           disabled={loading}
-          className="w-full flex items-center justify-center gap-2 bg-emerald-700 text-white py-3 rounded-lg font-medium hover:bg-emerald-800 transition disabled:opacity-60"
+          className="flex h-[51px] w-full items-center justify-center gap-2 rounded-[8px] bg-[#07875f] text-[15px] font-semibold text-white shadow-sm transition hover:bg-[#067650] disabled:cursor-not-allowed disabled:opacity-60"
         >
-          <UserPlus size={18} /> {loading ? "Creating..." : "Create Account"}
+          <UserPlus size={18} />
+
+          {loading ? "Creating..." : "Create Account"}
         </button>
 
-        {error && <p className="text-red-600 text-sm mt-3 break-words">{error}</p>}
-        {success && (
-          <p className="text-green-600 text-sm mt-3">Account created! Redirecting to login...</p>
+        {/* ERROR */}
+
+        {error && (
+          <p className="mt-4 break-words rounded-[7px] bg-red-50 p-3 text-sm text-red-600">
+            {error}
+          </p>
         )}
 
-        <p className="text-base font-semibold text-gray-700 mt-5 text-center">
+        {/* SUCCESS */}
+
+        {success && (
+          <p className="mt-4 rounded-[7px] bg-green-50 p-3 text-sm text-green-700">
+            Account created! Redirecting to login...
+          </p>
+        )}
+
+        {/* LOGIN */}
+
+        <p className="mt-6 text-center text-[14px] text-[#53615e]">
           Already have an account?{" "}
-          <Link to="/login" className="text-emerald-700 font-bold">Log in</Link>
+          <Link
+            to="/login"
+            className="font-bold text-[#07875f] hover:text-[#056a4b]"
+          >
+            Log in
+          </Link>
         </p>
+
       </div>
-    </div>
+    </AuthBackground>
   );
 }
 

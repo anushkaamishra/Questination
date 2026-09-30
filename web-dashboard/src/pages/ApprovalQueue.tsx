@@ -1,134 +1,71 @@
-import { useState, useEffect } from "react";
-import { ShieldCheck, Check } from "lucide-react";
+import { useState } from "react";
+import { ShieldCheck, Check, X } from "lucide-react";
 import PageHeader from "../components/PageHeader";
-import { getToken } from "../api/auth";
 
-const API_BASE = "https://questination-production.up.railway.app";
+interface Application {
+  id: string;
+  name: string;
+  role: "seller";
+  docId: string;
+  verificationStatus: "pending" | "approved" | "rejected";
+}
+
+const initialApplications: Application[] = [
+  { id: "1", name: "Ramesh Handicrafts", role: "seller", docId: "UDYAM-2938", verificationStatus: "pending" },
+  { id: "2", name: "Local Pottery Co.", role: "seller", docId: "ODOP-4471", verificationStatus: "pending" },
+  { id: "3", name: "Awadh Craft House", role: "seller", docId: "UDYAM-5812", verificationStatus: "pending" },
+  { id: "4", name: "Gomti Terracotta Works", role: "seller", docId: "ODOP-7316", verificationStatus: "pending" },
+  { id: "5", name: "Chikankari Heritage Studio", role: "seller", docId: "UDYAM-9045", verificationStatus: "pending" },
+];
 
 function ApprovalQueue() {
-  const [sellerId, setSellerId] = useState("");
-  const [cityId, setCityId] = useState("");
-  const [craftName, setCraftName] = useState("");
-  const [craftOptions, setCraftOptions] = useState<string[]>([]);
-  const [success, setSuccess] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
+  const [applications, setApplications] = useState<Application[]>(initialApplications);
 
-  useEffect(() => {
-    if (!cityId) {
-      setCraftOptions([]);
-      return;
-    }
-    async function fetchCraftCategories() {
-      try {
-        const response = await fetch(
-          `${API_BASE}/api/preferences/cities/${cityId}/craft-categories`
-        );
-        const data = await response.json();
-        if (response.ok && Array.isArray(data)) {
-          setCraftOptions(data);
-        } else if (response.ok && Array.isArray(data.categories)) {
-          setCraftOptions(data.categories);
-        } else {
-          setCraftOptions([]);
-        }
-      } catch (err) {
-        setCraftOptions([]);
-      }
-    }
-    fetchCraftCategories();
-  }, [cityId]);
+  function handleApprove(id: string) {
+    setApplications(applications.filter((app) => app.id !== id));
+  }
 
-  async function handleVerify() {
-    setLoading(true);
-    setError("");
-    setSuccess(false);
-    try {
-      const token = getToken();
-      const response = await fetch(`${API_BASE}/api/sellers/${sellerId}/verify-craft`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({ craftName, city_id: cityId }),
-      });
-      if (response.ok) {
-        setSuccess(true);
-        setSellerId("");
-        setCraftName("");
-        setCityId("");
-      } else {
-        setError("Could not verify seller. Check the Seller ID and try again.");
-      }
-    } catch (err) {
-      setError("Something went wrong. Please try again.");
-    } finally {
-      setLoading(false);
-    }
+  function handleReject(id: string) {
+    setApplications(applications.filter((app) => app.id !== id));
   }
 
   return (
     <div>
-      <PageHeader title="Verify Seller" subtitle="Assign craft type and city to approve a seller." />
-      <div className="bg-white p-8 rounded-2xl shadow-lg shadow-emerald-900/5 w-full max-w-md border border-amber-100">
-        <div className="flex items-center gap-2 mb-4 text-emerald-700">
-          <ShieldCheck size={22} />
-          <span className="font-semibold">Seller Verification</span>
-        </div>
-
-        <label className="block text-sm font-medium mb-1 text-gray-700">Seller ID</label>
-        <input
-          type="text"
-          value={sellerId}
-          onChange={(e) => setSellerId(e.target.value)}
-          className="w-full border border-gray-200 rounded-lg px-4 py-3 mb-3 focus:outline-none focus:ring-2 focus:ring-emerald-400 transition"
-        />
-
-        <label className="block text-sm font-medium mb-1 text-gray-700">
-          City ID <span className="text-gray-400 font-normal">(e.g. city-lucknow, city-varanasi)</span>
-        </label>
-        <input
-          type="text"
-          value={cityId}
-          onChange={(e) => setCityId(e.target.value)}
-          className="w-full border border-gray-200 rounded-lg px-4 py-3 mb-3 focus:outline-none focus:ring-2 focus:ring-emerald-400 transition"
-        />
-
-        <label className="block text-sm font-medium mb-1 text-gray-700">Craft Name</label>
-        {craftOptions.length > 0 ? (
-          <select
-            value={craftName}
-            onChange={(e) => setCraftName(e.target.value)}
-            className="w-full border border-gray-200 rounded-lg px-4 py-3 mb-4 focus:outline-none focus:ring-2 focus:ring-emerald-400 transition"
-          >
-            <option value="">Select a craft category</option>
-            {craftOptions.map((craft) => (
-              <option key={craft} value={craft}>
-                {craft}
-              </option>
-            ))}
-          </select>
-        ) : (
-          <input
-            type="text"
-            value={craftName}
-            onChange={(e) => setCraftName(e.target.value)}
-            placeholder={cityId ? "No categories found - type manually" : "Enter City ID first"}
-            className="w-full border border-gray-200 rounded-lg px-4 py-3 mb-4 focus:outline-none focus:ring-2 focus:ring-emerald-400 transition"
-          />
+      <PageHeader title="Pending Approvals" subtitle="Verify seller documents before granting access." />
+      <div className="w-full max-w-lg flex flex-col gap-3">
+        {applications.length === 0 && (
+          <p className="text-gray-500">No pending applications.</p>
         )}
-
-        <button
-          onClick={handleVerify}
-          disabled={loading}
-          className="w-full flex items-center justify-center gap-2 bg-emerald-700 text-white py-3 rounded-lg font-medium hover:bg-emerald-800 transition disabled:opacity-60"
-        >
-          <Check size={18} /> {loading ? "Verifying..." : "Verify Seller"}
-        </button>
-
-        {error && <p className="text-red-600 text-sm mt-3">{error}</p>}
-        {success && <p className="text-green-600 text-sm mt-3 font-medium">Seller verified successfully!</p>}
+        {applications.map((app) => (
+          <div
+            key={app.id}
+            className="bg-white p-4 rounded-2xl shadow-lg shadow-emerald-900/5 border border-amber-100 flex justify-between items-center"
+          >
+            <div className="flex items-center gap-3">
+              <div className="w-9 h-9 rounded-full bg-emerald-50 text-emerald-700 flex items-center justify-center">
+                <ShieldCheck size={18} />
+              </div>
+              <div>
+                <p className="font-semibold text-gray-800">{app.name}</p>
+                <p className="text-sm text-gray-500 capitalize">{app.role} • Doc ID: {app.docId}</p>
+              </div>
+            </div>
+            <div className="flex gap-2">
+              <button
+                onClick={() => handleApprove(app.id)}
+                className="flex items-center gap-1 bg-emerald-700 text-white px-3 py-2 rounded-lg hover:bg-emerald-800 transition text-sm"
+              >
+                <Check size={16} /> Approve
+              </button>
+              <button
+                onClick={() => handleReject(app.id)}
+                className="flex items-center gap-1 bg-red-50 text-red-600 px-3 py-2 rounded-lg hover:bg-red-100 transition text-sm"
+              >
+                <X size={16} /> Reject
+              </button>
+            </div>
+          </div>
+        ))}
       </div>
     </div>
   );

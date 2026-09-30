@@ -5,9 +5,9 @@ import Layout from "./components/Layout";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import SellerProfile from "./pages/SellerProfile";
-import ApprovalQueue from "./pages/ApprovalQueue";
 import MonumentSeeder from "./pages/MonumentSeeder";
 import PromoteUser from "./pages/PromoteUser";
+import VerifySeller from "./pages/VerifySeller";
 
 function App() {
   return (
@@ -16,13 +16,20 @@ function App() {
         <Routes>
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
+
           <Route element={<RequireRole />}>
             <Route element={<Layout />}>
-              <Route path="/" element={<SellerProfile />} />
-              <Route path="/profile" element={<SellerProfile />} />
-              <Route path="/admin" element={<ApprovalQueue />} />
-              <Route path="/monuments" element={<MonumentSeeder />} />
-              <Route path="/promote" element={<PromoteUser />} />
+              <Route path="/" element={<Login />} />
+
+              <Route element={<RequireRole allowedRoles={["seller"]} />}>
+                <Route path="/profile" element={<SellerProfile />} />
+              </Route>
+
+              <Route element={<RequireRole allowedRoles={["admin"]} />}>
+                <Route path="/admin" element={<VerifySeller />} />
+                <Route path="/monuments" element={<MonumentSeeder />} />
+                <Route path="/promote" element={<PromoteUser />} />
+              </Route>
             </Route>
           </Route>
         </Routes>

@@ -2,7 +2,7 @@ import { useState } from "react";
 import { CheckCircle2, XCircle, TicketPercent } from "lucide-react";
 import PageHeader from "../components/PageHeader";
 
-const API_BASE = "https://questination-production.up.railway.app";
+const API_BASE = "https://questination-production-08b6.up.railway.app";
 
 function CouponRedeem() {
   const [couponId, setCouponId] = useState("");

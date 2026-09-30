@@ -1,4 +1,5 @@
 import { createContext, useContext, useState, type ReactNode } from "react";
+import { decodeToken, getToken } from "../api/auth";
 
 type Role = "seller" | "admin" | null;
 
@@ -9,8 +10,18 @@ interface RoleContextType {
 
 const RoleContext = createContext<RoleContextType | undefined>(undefined);
 
+function getInitialRole(): Role {
+  const token = getToken();
+  if (!token) return null;
+
+  const decoded = decodeToken(token);
+  return decoded?.role === "seller" || decoded?.role === "admin"
+    ? decoded.role
+    : null;
+}
+
 export function RoleProvider({ children }: { children: ReactNode }) {
-  const [role, setRole] = useState<Role>(null);
+  const [role, setRole] = useState<Role>(getInitialRole);
 
   return (
     <RoleContext.Provider value={{ role, setRole }}>
