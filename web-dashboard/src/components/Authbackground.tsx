@@ -171,15 +171,32 @@ export default function AuthBackground({ children }: AuthBackgroundProps) {
           </div>
 
           {/* HERO COPY — deliberately kept above cards */}
-          <div className="absolute left-[38px] top-[174px] z-[80]">
-            <div className="font-serif text-[38px] font-bold italic leading-[1.05] text-[#076653]">
-              Explore Heritage
-            </div>
-            <div className="mt-[10px] font-serif text-[31px] font-bold italic leading-[1.05] text-[#076653]">
-              Play. Earn. Support Local.
-            </div>
-            <div className="mt-[25px] h-[5px] w-[205px] -rotate-[3deg] rounded-full bg-[#14745f]" />
-          </div>
+          <div className="absolute left-[42px] top-[145px] z-[80] pointer-events-none w-[310px]">
+  <div
+    className="font-serif text-[34px] font-bold italic leading-[1.05] text-[#075e50]"
+    style={{
+      textShadow:
+        "0 1px 0 rgba(255,255,255,0.95), 0 3px 8px rgba(234,247,232,0.95)",
+    }}
+  >
+    Explore Heritage
+  </div>
+
+  <div
+    className="mt-[6px] font-serif text-[27px] font-bold italic leading-[1.05] text-[#075e50]"
+    style={{
+      textShadow:
+        "0 1px 0 rgba(255,255,255,0.95), 0 3px 8px rgba(234,247,232,0.95)",
+    }}
+  >
+    Play. Earn. Support Local.
+  </div>
+
+  <div className="mt-[16px] h-[5px] w-[190px] -rotate-[3deg] rounded-full bg-[#14745f]" />
+</div>
+
+  
+
 
           {/* ROUTE */}
           <svg

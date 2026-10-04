@@ -3,5 +3,14 @@ import { useRole } from "../context/RoleContext";
 
 export default function RoleHome() {
   const { role } = useRole();
-  return <Navigate to={role === "admin" ? "/admin" : "/profile"} replace />;
+
+  if (role === "admin") {
+    return <Navigate to="/admin" replace />;
+  }
+
+  if (role === "seller") {
+    return <Navigate to="/profile" replace />;
+  }
+
+  return <Navigate to="/login" replace />;
 }

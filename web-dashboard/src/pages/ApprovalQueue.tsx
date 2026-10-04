@@ -1,74 +1,288 @@
 import { useState } from "react";
-import { ShieldCheck, Check, X } from "lucide-react";
-import PageHeader from "../components/PageHeader";
 
-interface Application {
-  id: string;
-  name: string;
-  role: "seller";
-  docId: string;
-  verificationStatus: "pending" | "approved" | "rejected";
-}
+type SellerApplication = {
+  sellerId: string;
+  shopName: string;
+  address: string;
+  craftName: string;
+  documentId: string;
+};
 
-const initialApplications: Application[] = [
-  { id: "1", name: "Ramesh Handicrafts", role: "seller", docId: "UDYAM-2938", verificationStatus: "pending" },
-  { id: "2", name: "Local Pottery Co.", role: "seller", docId: "ODOP-4471", verificationStatus: "pending" },
-  { id: "3", name: "Awadh Craft House", role: "seller", docId: "UDYAM-5812", verificationStatus: "pending" },
-  { id: "4", name: "Gomti Terracotta Works", role: "seller", docId: "ODOP-7316", verificationStatus: "pending" },
-  { id: "5", name: "Chikankari Heritage Studio", role: "seller", docId: "UDYAM-9045", verificationStatus: "pending" },
+const initialApplications: SellerApplication[] = [
+  {
+    sellerId: "seller-ramesh",
+    shopName: "Ramesh Handicrafts",
+    address: "Lucknow, Uttar Pradesh",
+    craftName: "Chikankari",
+    documentId: "UDYAM-2938",
+  },
+  {
+    sellerId: "seller-pottery",
+    shopName: "Local Pottery Co.",
+    address: "Lucknow, Uttar Pradesh",
+    craftName: "Terracotta",
+    documentId: "ODOP-4471",
+  },
+  {
+    sellerId: "seller-awadh",
+    shopName: "Awadh Craft House",
+    address: "Lucknow, Uttar Pradesh",
+    craftName: "Handicrafts",
+    documentId: "UDYAM-5812",
+  },
+  {
+    sellerId: "seller-gomti",
+    shopName: "Gomti Terracotta Works",
+    address: "Lucknow, Uttar Pradesh",
+    craftName: "Terracotta",
+    documentId: "ODOP-7316",
+  },
+  {
+    sellerId: "seller-chikankari",
+    shopName: "Chikankari Heritage Studio",
+    address: "Lucknow, Uttar Pradesh",
+    craftName: "Chikankari",
+    documentId: "UDYAM-9045",
+  },
 ];
 
-function ApprovalQueue() {
-  const [applications, setApplications] = useState<Application[]>(initialApplications);
+export default function ApprovalQueue() {
+  const [applications, setApplications] =
+    useState<SellerApplication[]>(initialApplications);
 
-  function handleApprove(id: string) {
-    setApplications(applications.filter((app) => app.id !== id));
-  }
+  const [selectedSeller, setSelectedSeller] =
+    useState<SellerApplication | null>(null);
 
-  function handleReject(id: string) {
-    setApplications(applications.filter((app) => app.id !== id));
-  }
+  const [message, setMessage] = useState("");
+
+  const handleVerify = () => {
+    if (!selectedSeller) return;
+
+    setApplications((prev) =>
+      prev.filter((seller) => seller.sellerId !== selectedSeller.sellerId)
+    );
+
+    setMessage(
+      `${selectedSeller.shopName} has been verified successfully.`
+    );
+
+    setSelectedSeller(null);
+  };
+
+  const handleReject = () => {
+    if (!selectedSeller) return;
+
+    setApplications((prev) =>
+      prev.filter((seller) => seller.sellerId !== selectedSeller.sellerId)
+    );
+
+    setMessage(
+      `${selectedSeller.shopName} has been rejected.`
+    );
+
+    setSelectedSeller(null);
+  };
 
   return (
-    <div>
-      <PageHeader title="Pending Approvals" subtitle="Verify seller documents before granting access." />
-      <div className="w-full max-w-lg flex flex-col gap-3">
-        {applications.length === 0 && (
-          <p className="text-gray-500">No pending applications.</p>
-        )}
-        {applications.map((app) => (
-          <div
-            key={app.id}
-            className="bg-white p-4 rounded-2xl shadow-lg shadow-emerald-900/5 border border-amber-100 flex justify-between items-center"
-          >
-            <div className="flex items-center gap-3">
-              <div className="w-9 h-9 rounded-full bg-emerald-50 text-emerald-700 flex items-center justify-center">
-                <ShieldCheck size={18} />
+    <div className="space-y-8">
+      {/* HEADER */}
+      <div>
+        <h1 className="text-3xl font-bold text-[#064f42]">
+          Verify Seller
+        </h1>
+
+        <p className="mt-2 text-gray-600">
+          Review pending seller applications before approving them.
+        </p>
+      </div>
+
+      {/* SUCCESS / STATUS MESSAGE */}
+      {message && (
+        <div className="rounded-xl border border-[#b9e4d8] bg-[#f0faf7] px-5 py-4 text-sm font-semibold text-[#087f68]">
+          {message}
+        </div>
+      )}
+
+      {/* PENDING APPLICATIONS */}
+      <div className="rounded-2xl bg-white p-6 shadow-sm">
+        <div className="mb-6 flex items-center justify-between">
+          <div>
+            <h2 className="text-xl font-bold text-[#064f42]">
+              Pending Seller Applications
+            </h2>
+
+            <p className="mt-1 text-sm text-gray-500">
+              Select an application to review the submitted seller details.
+            </p>
+          </div>
+
+          <span className="rounded-full bg-[#e8f7f2] px-4 py-2 text-sm font-semibold text-[#087f68]">
+            {applications.length} Pending
+          </span>
+        </div>
+
+        {applications.length === 0 ? (
+          <div className="rounded-xl border border-dashed border-gray-200 px-6 py-12 text-center">
+            <p className="font-semibold text-gray-600">
+              No pending seller applications.
+            </p>
+
+            <p className="mt-1 text-sm text-gray-400">
+              New seller applications will appear here.
+            </p>
+          </div>
+        ) : (
+          <div className="space-y-4">
+            {applications.map((seller) => (
+              <div
+                key={seller.sellerId}
+                className="flex flex-col gap-5 rounded-xl border border-gray-100 p-5 transition hover:border-[#b9e4d8] hover:bg-[#fbfefd] md:flex-row md:items-center md:justify-between"
+              >
+                {/* SELLER SUMMARY */}
+                <div className="min-w-0">
+                  <h3 className="text-lg font-bold text-gray-800">
+                    {seller.shopName}
+                  </h3>
+
+                  <div className="mt-2 flex flex-wrap gap-x-5 gap-y-1 text-sm text-gray-500">
+                    <span>{seller.craftName}</span>
+                    <span>{seller.address}</span>
+                  </div>
+
+                  <p className="mt-2 text-xs text-gray-400">
+                    Seller ID: {seller.sellerId}
+                  </p>
+                </div>
+
+                {/* REVIEW BUTTON */}
+                <button
+                  type="button"
+                  onClick={() => {
+                    setSelectedSeller(seller);
+                    setMessage("");
+                  }}
+                  className="shrink-0 rounded-xl border border-[#087f68] px-5 py-2.5 font-semibold text-[#087f68] transition hover:bg-[#087f68] hover:text-white"
+                >
+                  Review
+                </button>
               </div>
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* REVIEW MODAL */}
+      {selectedSeller && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
+          <div className="w-full max-w-2xl rounded-2xl bg-white p-6 shadow-2xl">
+            {/* MODAL HEADER */}
+            <div className="flex items-start justify-between gap-4">
               <div>
-                <p className="font-semibold text-gray-800">{app.name}</p>
-                <p className="text-sm text-gray-500 capitalize">{app.role} • Doc ID: {app.docId}</p>
+                <p className="text-sm font-semibold text-[#087f68]">
+                  Seller Application
+                </p>
+
+                <h2 className="mt-1 text-2xl font-bold text-[#064f42]">
+                  {selectedSeller.shopName}
+                </h2>
+              </div>
+
+              <button
+                type="button"
+                onClick={() => setSelectedSeller(null)}
+                className="text-2xl leading-none text-gray-400 hover:text-gray-700"
+                aria-label="Close"
+              >
+                ×
+              </button>
+            </div>
+
+            {/* DETAILS */}
+            <div className="mt-6 overflow-hidden rounded-xl border border-gray-100">
+              <div className="grid grid-cols-1 divide-y divide-gray-100 md:grid-cols-2 md:divide-x md:divide-y-0">
+                <div className="p-4">
+                  <p className="text-xs font-semibold uppercase tracking-wide text-gray-400">
+                    Seller/User ID
+                  </p>
+
+                  <p className="mt-1 font-medium text-gray-800">
+                    {selectedSeller.sellerId}
+                  </p>
+                </div>
+
+                <div className="p-4">
+                  <p className="text-xs font-semibold uppercase tracking-wide text-gray-400">
+                    Shop Name
+                  </p>
+
+                  <p className="mt-1 font-medium text-gray-800">
+                    {selectedSeller.shopName}
+                  </p>
+                </div>
+              </div>
+
+              <div className="border-t border-gray-100 p-4">
+                <p className="text-xs font-semibold uppercase tracking-wide text-gray-400">
+                  Address
+                </p>
+
+                <p className="mt-1 font-medium text-gray-800">
+                  {selectedSeller.address}
+                </p>
+              </div>
+
+              <div className="grid grid-cols-1 divide-y divide-gray-100 border-t md:grid-cols-2 md:divide-x md:divide-y-0">
+                <div className="p-4">
+                  <p className="text-xs font-semibold uppercase tracking-wide text-gray-400">
+                    Craft
+                  </p>
+
+                  <p className="mt-1 font-medium text-gray-800">
+                    {selectedSeller.craftName}
+                  </p>
+                </div>
+
+                <div className="p-4">
+                  <p className="text-xs font-semibold uppercase tracking-wide text-gray-400">
+                    UDYAM / Document ID
+                  </p>
+
+                  <p className="mt-1 font-medium text-gray-800">
+                    {selectedSeller.documentId}
+                  </p>
+                </div>
               </div>
             </div>
-            <div className="flex gap-2">
+
+            {/* REVIEW NOTE */}
+            <div className="mt-5 rounded-xl bg-[#f5faf8] p-4">
+              <p className="text-sm leading-6 text-gray-600">
+                Review the submitted seller information and supporting
+                details before approving this application.
+              </p>
+            </div>
+
+            {/* ACTIONS */}
+            <div className="mt-6 flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
               <button
-                onClick={() => handleApprove(app.id)}
-                className="flex items-center gap-1 bg-emerald-700 text-white px-3 py-2 rounded-lg hover:bg-emerald-800 transition text-sm"
+                type="button"
+                onClick={handleReject}
+                className="rounded-xl border border-red-200 px-6 py-3 font-semibold text-red-600 transition hover:bg-red-50"
               >
-                <Check size={16} /> Approve
+                Reject
               </button>
+
               <button
-                onClick={() => handleReject(app.id)}
-                className="flex items-center gap-1 bg-red-50 text-red-600 px-3 py-2 rounded-lg hover:bg-red-100 transition text-sm"
+                type="button"
+                onClick={handleVerify}
+                className="rounded-xl bg-[#087f68] px-6 py-3 font-semibold text-white transition hover:bg-[#066a58]"
               >
-                <X size={16} /> Reject
+                Verify Seller
               </button>
             </div>
           </div>
-        ))}
-      </div>
+        </div>
+      )}
     </div>
   );
 }
-
-export default ApprovalQueue;
