@@ -1,9 +1,7 @@
 const prisma = require('../db/prismaClient.cjs');
-
 // POST /api/sellers/register
-// Assumes the user already exists in `users` (created via Firebase auth + Person 1's flow)
 async function registerSeller(req, res) {
-  const { userId, shop_name, description, tax_bracket_tier } = req.body;
+  const { userId, shop_name, description, tax_bracket_tier, address } = req.body;
 
   if (!userId || !shop_name) {
     return res.status(400).json({ error: 'userId and shop_name are required' });
@@ -11,7 +9,7 @@ async function registerSeller(req, res) {
 
   try {
     const seller = await prisma.sellers.create({
-      data: { id: userId, shop_name, description, tax_bracket_tier },
+      data: { id: userId, shop_name, description, tax_bracket_tier, address },
     });
     res.status(201).json(seller);
   } catch (err) {
@@ -31,12 +29,12 @@ async function getSellerProfile(req, res) {
 // PUT /api/sellers/:id
 async function updateSellerProfile(req, res) {
   const { id } = req.params;
-  const { shop_name, description, tax_bracket_tier } = req.body;
+  const { shop_name, description, tax_bracket_tier, address } = req.body;
 
   try {
     const updated = await prisma.sellers.update({
       where: { id },
-      data: { shop_name, description, tax_bracket_tier },
+      data: { shop_name, description, tax_bracket_tier, address },
     });
     res.json(updated);
   } catch (err) {
@@ -54,8 +52,6 @@ async function verifySellerCraft(req, res) {
   }
 
   try {
-    // Find or create the craft category for this city — this is what makes
-    // the category list grow dynamically as new sellers register
     let craftCategory = await prisma.craft_categories.findUnique({
       where: { name_city_id: { name: craftName, city_id } },
     });

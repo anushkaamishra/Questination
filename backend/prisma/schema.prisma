@@ -27,6 +27,7 @@ model completed_quests {
   user_id      String
   quest_id     String
   completed_at DateTime @default(now())
+  photo_url    String?
   quests       quests   @relation(fields: [quest_id], references: [id])
   users        users    @relation(fields: [user_id], references: [id])
 
@@ -81,6 +82,7 @@ model sellers {
   id                String            @id
   shop_name         String
   description       String?
+  address           String?
   tax_bracket_tier  String?
   craft_category_id String?
   city_id           String?
@@ -206,9 +208,9 @@ model journal_entries {
   quest_id   String
   photo_urls String[]
   caption    String?
-  is_public  Boolean  @default(false) 
   sticker_id String?
   created_at DateTime @default(now())
+  is_public  Boolean  @default(false)
   quests     quests   @relation(fields: [quest_id], references: [id])
   users      users    @relation(fields: [user_id], references: [id])
 }
